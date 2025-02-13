@@ -4,6 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>This is Ron’s</title>
+    <script type="module">
+        // Import Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyAFvcguJr0kDs57qWarZSe8mNPQSfPAVUw",
+          authDomain: "kreinins-website.firebaseapp.com",
+          databaseURL: "https://kreinins-website-default-rtdb.firebaseio.com",
+          projectId: "kreinins-website",
+          storageBucket: "kreinins-website.firebasestorage.app",
+          messagingSenderId: "759979363399",
+          appId: "1:759979363399:web:0995ba54ffbfd42b833562",
+          measurementId: "G-QFMHP1WE5G"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Update visit count
+        async function updateVisitCount() {
+            const countRef = ref(database, 'visit-count');
+            try {
+                let snapshot = await get(countRef);
+                let count = snapshot.exists() ? snapshot.val() + 1 : 1;
+                await set(countRef, count);
+                document.getElementById('visit-count').textContent = count;
+            } catch (error) {
+                console.error('Error updating visit count:', error);
+                document.getElementById('visit-count').textContent = 'Error';
+            }
+        }
+        
+        window.onload = updateVisitCount;
+    </script>
     <style>
         body {
             display: flex;
@@ -39,8 +76,8 @@
         }
         .cat {
             position: absolute;
-            width: 100px;
-            height: 100px;
+            width: 150px;
+            height: 150px;
         }
     </style>
 </head>
@@ -52,27 +89,15 @@
     <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" class="cat" id="cat">
     
     <script>
-        async function updateVisitCount() {
-            try {
-                let response = await fetch('https://your-backend-url.com/visit-counter');
-                let data = await response.json();
-                document.getElementById('visit-count').textContent = data.count;
-            } catch (error) {
-                console.error('Error fetching visit count:', error);
-                document.getElementById('visit-count').textContent = 'Error';
-            }
-        }
-        
         function moveCat() {
             let cat = document.getElementById('cat');
-            let maxX = window.innerWidth - 130;
-            let maxY = window.innerHeight - 130;
+            let maxX = window.innerWidth - 150;
+            let maxY = window.innerHeight - 150;
             cat.style.left = Math.random() * maxX + 'px';
             cat.style.top = Math.random() * maxY + 'px';
         }
         
         setInterval(moveCat, 1000);
-        updateVisitCount();
     </script>
 </body>
 </html>
