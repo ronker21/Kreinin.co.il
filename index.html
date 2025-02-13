@@ -3,15 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kreinin</title>
+    <title>This is Ron’s</title>
     <style>
         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            background-color: #f4f4f4;
             font-family: Arial, sans-serif;
-            text-align: center;
+            margin: 0;
+        }
+        h1 {
+            font-size: 60px;
+            color: #333;
+            margin: 0;
+        }
+        p {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+        a {
+            color: #666;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
         .counter {
-            font-size: 24px;
-            margin: 20px 0;
+            font-size: 20px;
+            color: #444;
+            margin: 15px 0;
         }
         .cat {
             position: absolute;
@@ -21,9 +45,9 @@
     </style>
 </head>
 <body>
-    <h1>This is Ron's</h1>
+    <h1>This is Ron’s</h1>
     <div class="counter">Visited this amazing website: <span id="visit-count">Loading...</span> times</div>
-    <h3>ron@kreinin.co.il</h3>
+    <p>You can contact: <a href="mailto:ron@kreinin.co.il">ron@kreinin.co.il</a></p>
     
     <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" class="cat" id="cat">
     
@@ -41,8 +65,8 @@
         
         function moveCat() {
             let cat = document.getElementById('cat');
-            let maxX = window.innerWidth - 100;
-            let maxY = window.innerHeight - 100;
+            let maxX = window.innerWidth - 130;
+            let maxY = window.innerHeight - 130;
             cat.style.left = Math.random() * maxX + 'px';
             cat.style.top = Math.random() * maxY + 'px';
         }
