@@ -51,6 +51,7 @@
             background-color: #f4f4f4;
             font-family: Arial, sans-serif;
             margin: 0;
+            position: relative;
         }
         h1 {
             font-size: 60px;
@@ -79,9 +80,18 @@
             width: 150px;
             height: 150px;
         }
+        .safe-zone {
+            position: absolute;
+            width: 50%;
+            height: 30%;
+            top: 35%;
+            left: 25%;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
+    <div class="safe-zone"></div>
     <h1>This is Ron’s</h1>
     <div class="counter">This website has been visited <span id="visit-count">Loading...</span> times</div>
     <p>You can contact: <a href="mailto:ron@kreinin.co.il">ron@kreinin.co.il</a></p>
@@ -91,10 +101,21 @@
     <script>
         function moveCat() {
             let cat = document.getElementById('cat');
+            let safeZone = document.querySelector('.safe-zone');
             let maxX = window.innerWidth - 150;
             let maxY = window.innerHeight - 150;
-            cat.style.left = Math.random() * maxX + 'px';
-            cat.style.top = Math.random() * maxY + 'px';
+            let newX, newY;
+            
+            do {
+                newX = Math.random() * maxX;
+                newY = Math.random() * maxY;
+            } while (
+                newX > safeZone.offsetLeft && newX < safeZone.offsetLeft + safeZone.offsetWidth &&
+                newY > safeZone.offsetTop && newY < safeZone.offsetTop + safeZone.offsetHeight
+            );
+            
+            cat.style.left = newX + 'px';
+            cat.style.top = newY + 'px';
         }
         
         setInterval(moveCat, 1000);
