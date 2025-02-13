@@ -3,39 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>This is Ron’s</title>
+    <title>Kreinin</title>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-            background-color: #f4f4f4;
             font-family: Arial, sans-serif;
-            margin: 0;
+            text-align: center;
         }
-        h1 {
-            font-size: 60px;
-            color: #333;
-            margin: 0;
+        .counter {
+            font-size: 24px;
+            margin: 20px 0;
         }
-        p {
-            font-size: 16px;
-            color: #666;
-            margin-top: 10px;
-        }
-        a {
-            color: #666;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
+        .cat {
+            position: absolute;
+            width: 100px;
+            height: 100px;
         }
     </style>
 </head>
 <body>
-    <h1>This is Ron’s</h1>
-    <p>You can contact: <a href="mailto:ron@kreinin.co.il">ron@kreinin.co.il</a></p>
+    <h1>This is Ron's</h1>
+    <div class="counter">Visited this amazing website: <span id="visit-count">Loading...</span> times</div>
+    <h3>ron@kreinin.co.il</h3>
+    
+    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" class="cat" id="cat">
+    
+    <script>
+        async function updateVisitCount() {
+            try {
+                let response = await fetch('https://your-backend-url.com/visit-counter');
+                let data = await response.json();
+                document.getElementById('visit-count').textContent = data.count;
+            } catch (error) {
+                console.error('Error fetching visit count:', error);
+                document.getElementById('visit-count').textContent = 'Error';
+            }
+        }
+        
+        function moveCat() {
+            let cat = document.getElementById('cat');
+            let maxX = window.innerWidth - 100;
+            let maxY = window.innerHeight - 100;
+            cat.style.left = Math.random() * maxX + 'px';
+            cat.style.top = Math.random() * maxY + 'px';
+        }
+        
+        setInterval(moveCat, 1000);
+        updateVisitCount();
+    </script>
 </body>
 </html>
