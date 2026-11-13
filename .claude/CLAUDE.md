@@ -7,7 +7,7 @@ Owner prefers a blunt mentor: challenge weak ideas, say what's risky, don't flat
 ## What this is
 Static site, no build step, no package.json. Deployed by **GitHub Pages from `main`**
 (push = publish, usually live within ~1–2 min). Custom domain via `CNAME` →
-`www.kreinin.co.il` (DNS at MyNames; Cloudflare may still sit in front — unverified).
+`www.kreinin.co.il` (DNS at MyNames). Verified 2026-11-13: served directly by GitHub Pages (`server: GitHub.com`, no `cf-ray`) — Cloudflare is NOT proxying.
 
 | Path | What |
 |---|---|
@@ -56,4 +56,4 @@ Static site, no build step, no package.json. Deployed by **GitHub Pages from `ma
 - `readings.js` is ~900 KB raw / ~210 KB gzip loaded up front on mobile; could split per
   combo if load time matters. Not urgent.
 - `?v=` cache-busting is manual — candidate for automation (e.g. content hash).
-- Cloudflare/Firebase status unverified.
+- Firebase status unverified; whether Cloudflare still holds DNS is unverified (it is not proxying).
