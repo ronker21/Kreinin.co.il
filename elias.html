@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f4f2ee">
+<title>אליאס משפחתי</title>
+<link rel="stylesheet" href="/fonts.css">
+<style>
+:root{--paper:#f4f2ee;--card:#fff;--ink:#242824;--body:#424940;--muted:#62685e;--line:#d3d6cc;
+--accent:#2f5d50;--accent-ink:#fff;--ok:#1e6b3a;--ok-bg:#e3f2e7;--bad:#a42b22;--bad-bg:#fbe7e5;--warn:#7a5300;--warn-bg:#fdf1d6}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;font-family:'Assistant',Heebo,Arial,sans-serif;color:var(--body);font-size:18px;line-height:1.5;
+  padding:24px 16px calc(32px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
+main{max-width:460px;margin:0 auto}
+h1{font-family:Heebo,Arial,sans-serif;font-weight:700;color:var(--ink);font-size:30px;margin:0 0 4px;letter-spacing:-.3px}
+.sub{color:var(--muted);margin:0 0 22px;font-size:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.counter{margin-bottom:16px}
+.counter p{margin:0 0 10px;color:var(--ink);font-size:18px}
+.counter b{font-size:22px;font-variant-numeric:tabular-nums}
+.bar{height:10px;border-radius:99px;background:#e6e7e0;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .5s ease}
+.label{display:block;font-size:15px;color:var(--muted);margin:0 0 8px}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.who button{font:inherit;font-size:19px;font-weight:600;padding:12px;border-radius:12px;border:1.5px solid var(--line);
+  background:var(--paper);color:var(--body);cursor:pointer}
+.who button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.row{display:flex;gap:8px}
+input{flex:1;min-width:0;font:inherit;font-size:20px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);
+  background:#fff;color:var(--ink)}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,93,80,.15)}
+.add{font:inherit;font-size:19px;font-weight:600;padding:12px 20px;border-radius:12px;border:0;background:var(--accent);
+  color:var(--accent-ink);cursor:pointer;white-space:nowrap}
+.add:disabled,.who button:disabled{opacity:.55;cursor:default}
+.msg{margin-top:14px;padding:12px 14px;border-radius:12px;font-size:17px;display:none}
+.msg.show{display:block}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+.msg.bad{background:var(--bad-bg);color:var(--bad)}
+.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.msg.info{background:#eef0ea;color:var(--muted)}
+.msg .btns{display:flex;gap:8px;margin-top:10px}
+.msg .btns button{font:inherit;font-size:17px;font-weight:600;flex:1;padding:10px;border-radius:10px;cursor:pointer;border:1.5px solid currentColor;background:transparent;color:inherit}
+.msg .btns button.yes{background:var(--warn);border-color:var(--warn);color:#fff}
+details{margin-top:16px}
+summary{cursor:pointer;color:var(--muted);font-size:16px;padding:6px 0}
+ul{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px}
+li{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:16px;color:var(--ink)}
+li.new{border-color:var(--ok);background:var(--ok-bg)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<main>
+  <h1>אליאס משפחתי</h1>
+  <p class="sub">כל אחד מוסיף מילים למשחק. רק שלא יהיו כפולות.</p>
+
+  <section class="card counter" aria-live="polite">
+    <p id="countText">טוען…</p>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="500" id="bar"><i id="barFill"></i></div>
+  </section>
+
+  <section class="card">
+    <span class="label" id="whoLabel">מי מוסיף?</span>
+    <div class="who" role="group" aria-labelledby="whoLabel">
+      <button type="button" data-who="dad" aria-pressed="false">אבא</button>
+      <button type="button" data-who="mom" aria-pressed="false">אמא</button>
+    </div>
+
+    <form id="form" autocomplete="off">
+      <label class="sr" for="word">מילה חדשה</label>
+      <div class="row">
+        <input id="word" name="word" maxlength="40" placeholder="מילה חדשה" enterkeyhint="send" required>
+        <button class="add" id="addBtn" type="submit">הוספה</button>
+      </div>
+    </form>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+    <details id="listBox">
+      <summary id="listTitle">המילים שכבר ברשימה</summary>
+      <ul id="list"></ul>
+    </details>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'PASTE_WEB_APP_URL_HERE';
+  var NAMES = { dad: 'אבא', mom: 'אמא' };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('form'), input = $('word'), addBtn = $('addBtn'), msg = $('msg');
+  var whoBtns = Array.prototype.slice.call(document.querySelectorAll('.who button'));
+  var state = { count: 0, target: 500, dad: [], mom: [] };
+  var who = null, busy = false, justAdded = '';
+
+  try { who = localStorage.getItem('elias-who'); } catch (e) {}
+  if (!NAMES[who]) who = null;
+
+  function setWho(w) {
+    who = w;
+    whoBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.who === w)); });
+    try { localStorage.setItem('elias-who', w); } catch (e) {}
+    renderList();
+  }
+  whoBtns.forEach(function (b) {
+    b.addEventListener('click', function () { if (!busy) { setWho(b.dataset.who); hideMsg(); input.focus(); } });
+  });
+
+  function renderCount() {
+    var t = state.target || 500, c = state.count || 0;
+    $('countText').innerHTML = 'יש כבר <b>' + c + '</b> מילים מתוך ' + t;
+    $('barFill').style.width = Math.min(100, c / t * 100) + '%';
+    $('bar').setAttribute('aria-valuenow', c);
+    $('bar').setAttribute('aria-valuemax', t);
+  }
+
+  function renderList() {
+    var ul = $('list'), title = $('listTitle');
+    ul.textContent = '';
+    var words = who ? state[who].slice().reverse() : state.dad.concat(state.mom).reverse();
+    title.textContent = (who ? 'המילים של ' + NAMES[who] : 'כל המילים') + ' (' + words.length + ')';
+    words.forEach(function (w) {
+      var li = document.createElement('li');
+      li.textContent = w;
+      if (w === justAdded) li.className = 'new';
+      ul.appendChild(li);
+    });
+  }
+
+  function hideMsg() { msg.className = 'msg'; msg.textContent = ''; }
+  function showMsg(kind, text) {
+    msg.className = 'msg show ' + kind;
+    msg.textContent = text;
+  }
+
+  function setBusy(b) {
+    busy = b;
+    addBtn.disabled = b;
+    addBtn.textContent = b ? 'בודק…' : 'הוספה';
+    whoBtns.forEach(function (x) { x.disabled = b; });
+  }
+
+  function apiReady() { return /^https:\/\/script\.google\.com\//.test(API); }
+
+  function loadState() {
+    if (!apiReady()) { $('countText').textContent = 'הדף עוד לא מחובר לגיליון.'; return; }
+    fetch(API + '?action=state', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (s) {
+        state.count = s.count; state.target = s.target || 500;
+        state.dad = s.dad || []; state.mom = s.mom || [];
+        renderCount(); renderList();
+      })
+      .catch(function () { $('countText').textContent = 'לא הצלחתי לטעון את הרשימה. בדקו חיבור ורעננו.'; });
+  }
+
+  function send(word, force) {
+    setBusy(true);
+    return fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ word: word, who: who, force: !!force })
+    })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (res) { setBusy(false); handle(res, word); })
+      .catch(function () { setBusy(false); showMsg('bad', 'משהו השתבש בשליחה. המילה לא נשמרה, נסו שוב.'); });
+  }
+
+  function handle(res, word) {
+    if (typeof res.count === 'number') { state.count = res.count; renderCount(); }
+    switch (res.status) {
+      case 'added':
+        justAdded = word.replace(/\s+/g, ' ').trim();
+        state[who].push(justAdded);
+        renderList();
+        showMsg('ok', '״' + justAdded + '״ נוספה. תודה!');
+        input.value = '';
+        input.focus();
+        break;
+      case 'exists':
+        showMsg('bad', '״' + (res.match || word) + '״ כבר נמצאת ברשימה. לא נוסף כלום.');
+        input.select();
+        break;
+      case 'similar':
+        askSimilar(word, res.match);
+        break;
+      case 'invalid':
+        showMsg('bad', 'זו לא נראית כמו מילה. נסו שוב.');
+        break;
+      case 'busy':
+        showMsg('bad', 'עמוס כרגע, נסו שוב בעוד רגע.');
+        break;
+      default:
+        showMsg('bad', 'תשובה לא צפויה מהשרת. המילה לא נשמרה.');
+    }
+  }
+
+  function askSimilar(word, match) {
+    msg.className = 'msg show warn';
+    msg.textContent = '';
+    var p = document.createElement('div');
+    p.textContent = 'יש כבר מילה דומה: ' + match + '. להוסיף בכל זאת?';
+    var btns = document.createElement('div'); btns.className = 'btns';
+    var yes = document.createElement('button'); yes.type = 'button'; yes.className = 'yes'; yes.textContent = 'כן, להוסיף';
+    var no = document.createElement('button'); no.type = 'button'; no.textContent = 'לא, ביטול';
+    yes.onclick = function () { send(word, true); };
+    no.onclick = function () { showMsg('info', 'בוטל. לא נוסף כלום.'); input.select(); };
+    btns.appendChild(yes); btns.appendChild(no);
+    msg.appendChild(p); msg.appendChild(btns);
+    yes.focus();
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var word = input.value.trim();
+    if (!word) return;
+    if (!who) { showMsg('bad', 'קודם בחרו מי מוסיף: אבא או אמא.'); return; }
+    if (!apiReady()) { showMsg('bad', 'הדף עוד לא מחובר לגיליון.'); return; }
+    hideMsg();
+    send(word, false);
+  });
+
+  if (who) setWho(who);
+  renderCount();
+  loadState();
+})();
+</script>
+</body>
+</html>
